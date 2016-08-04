@@ -1,26 +1,45 @@
 <?php
-include '../../tampilan/header_footer/index.php';
+session_start();
+ob_start();
+//Koneksi Database
+require_once('../../fungsi/app.config.php');
+
+//Menentukan menu apa yg sedang di pilih lewat url
+$menu = (isset($_GET['menu'])) ? $_GET['menu'] : '';
+
+//memanggil halaman
+include_once '../../tampilan/admin/header_footer/index.php';
+include_once '../../fungsi/admin/admin.php';
+include_once '../../fungsi/admin/nama_akun.php';
+include_once '../../tampilan/admin/admin.php';
+include_once '../../tampilan/admin/nama_akun.php';
+//Validasi Login
+if (!isset($_SESSION['user_name'])) {
+	if (isset($_POST['login'])) {
+		//bisa pake if lagi
+		login(addslashes($_POST['username']), md5($_POST['password']));
+		header("Location: index.php");
+	} else {
+		header("Location: ../../tampilan/admin/login.php");
+	}
+}
 
 Headers();
-?>
-	<title>Halaman Admin</title>
-
-	<div class="content-wrapper">
-		<!-- Konten -->
-		<section class="content">
-			<div class="box box-default">
-				<div class="box-body">
-		      		<div class="row">
-    					<div class="col-md-12">
-							<fieldset>
-								<legend>Selamat Datang</legend>
-							</fieldset>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-	</div>
-<?php
+sidebar($menu);
+switch ($menu) {
+	case 'admin':
+		menampilkanAdmin();
+		break;
+	case 'nama_akun':
+		menampilkanNamaAkun();
+		break;
+	case 'logout':
+		session_destroy();
+		header("Location: index.php");
+		break;
+	default:
+		menampilkanAdmin();
+		break;
+}
 Footer();
 ?>
